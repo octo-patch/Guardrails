@@ -353,7 +353,7 @@ def test_minimax_callable(mocker):
     callable_ = MiniMaxCallable()
     response = callable_(
         text="Hello",
-        model="MiniMax-M2.7",
+        model="MiniMax-M3",
     )
 
     assert isinstance(response, LLMResponse)
@@ -364,6 +364,8 @@ def test_minimax_callable(mocker):
     # Verify temperature was set to 1.0 (MiniMax requires > 0)
     call_kwargs = mock_client.chat.completions.create.call_args[1]
     assert call_kwargs["temperature"] == 1.0
+    # Verify the M3 model was passed through
+    assert call_kwargs["model"] == "MiniMax-M3"
 
 
 def test_minimax_callable_uses_custom_base_url(mocker):
@@ -405,7 +407,7 @@ def test_minimax_callable_uses_custom_base_url(mocker):
     callable_ = MiniMaxCallable()
     callable_(
         text="Hello",
-        model="MiniMax-M2.7",
+        model="MiniMax-M3",
         base_url="https://custom.minimax.io/v1",
     )
 
@@ -423,11 +425,25 @@ def test_minimax_callable_raises_without_api_key(mocker):
     callable_ = MiniMaxCallable()
 
     with pytest.raises(PromptCallableException):
-        callable_(text="Hello", model="MiniMax-M2.7")
+        callable_(text="Hello", model="MiniMax-M3")
 
 
 def test_get_llm_ask_minimax_model():
     """Test that model names starting with 'MiniMax' route to MiniMaxCallable."""
+    import os
+
+    os.environ["MINIMAX_API_KEY"] = "test-key"
+    try:
+        from guardrails.llm_providers import MiniMaxCallable
+
+        result = get_llm_ask(None, model="MiniMax-M3")
+        assert isinstance(result, MiniMaxCallable)
+    finally:
+        del os.environ["MINIMAX_API_KEY"]
+
+
+def test_get_llm_ask_minimax_m27_model():
+    """Test that MiniMax-M2.7 still routes to MiniMaxCallable."""
     import os
 
     os.environ["MINIMAX_API_KEY"] = "test-key"
@@ -464,7 +480,7 @@ def test_get_llm_ask_minimax_temperature_not_set_to_zero():
     try:
         with _warnings.catch_warnings(record=True) as w:
             _warnings.simplefilter("always")
-            result = get_llm_ask(None, model="MiniMax-M2.7")
+            result = get_llm_ask(None, model="MiniMax-M3")
             # Should not emit the temperature deprecation warning for MiniMax
             dep_warnings = [x for x in w if issubclass(x.category, DeprecationWarning)]
             assert len(dep_warnings) == 0
@@ -477,7 +493,7 @@ def test_get_llm_ask_returns_prompt_callable_base_directly():
     from guardrails.llm_providers import MiniMaxCallable
 
     instance = MiniMaxCallable()
-    result = get_llm_ask(instance, model="MiniMax-M2.7")
+    result = get_llm_ask(instance, model="MiniMax-M3")
     assert result is instance
 
 

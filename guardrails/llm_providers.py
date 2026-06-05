@@ -261,7 +261,7 @@ class MiniMaxCallable(PromptCallableBase):
     def _invoke_llm(
         self,
         text: Optional[str] = None,
-        model: str = "MiniMax-M2.7",
+        model: str = "MiniMax-M3",
         messages: Optional[List[Dict]] = None,
         api_key: Optional[str] = None,
         base_url: str = "https://api.minimax.io/v1",
@@ -276,7 +276,7 @@ class MiniMaxCallable(PromptCallableBase):
 
         raw_llm_response, validated_response = guard(
             MiniMaxCallable(),
-            model="MiniMax-M2.7",
+            model="MiniMax-M3",
             messages=[{"role": "user", "content": "..."}],
             ...
         )
@@ -285,7 +285,7 @@ class MiniMaxCallable(PromptCallableBase):
         Or use without an explicit callable by setting MINIMAX_API_KEY:
         ```
         raw_llm_response, validated_response = guard(
-            model="MiniMax-M2.7",
+            model="MiniMax-M3",
             messages=[{"role": "user", "content": "..."}],
             ...
         )
@@ -867,7 +867,7 @@ class AsyncMiniMaxCallable(AsyncPromptCallableBase):
     async def invoke_llm(
         self,
         text: Optional[str] = None,
-        model: str = "MiniMax-M2.7",
+        model: str = "MiniMax-M3",
         messages: Optional[List[Dict]] = None,
         api_key: Optional[str] = None,
         base_url: str = "https://api.minimax.io/v1",
